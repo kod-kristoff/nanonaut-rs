@@ -1,6 +1,7 @@
 pub mod camera;
 
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 
 fn main() {
@@ -16,6 +17,7 @@ fn main() {
         .add_startup_system(setup)
         .add_startup_stage("player_setup", SystemStage::single(spawn_player))
         .add_plugins(DefaultPlugins)
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .run();
 }
 
@@ -28,6 +30,20 @@ struct Name(String);
 
 // Systems
 fn spawn_player(mut commands: Commands) {
+    let rigid_body = RigidBodyBundle {
+        mass_properties: RigidBodyMassPropsFlags::ROTATION_LOCKED.into(),
+        activation: RigidBodyActivation::cannot_sleep().into(),
+        ccd: RigidBodyCcd { ccd_enabled: true, ..Default::default() }.into(),
+        ..Default::default()
+    };
+    let collider = ColliderBundle {
+        shape: ColliderShape::cuboid(0.5, 0.5).into(),
+        flags: ColliderFlags {
+            active_events: ActiveEvents::CONTACT_EVENTS,
+            ..Default::default()
+        }.into(),
+        ..Default::default()
+    };
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
@@ -37,6 +53,9 @@ fn spawn_player(mut commands: Commands) {
             },
             ..Default::default()
         })
+        .insert_bundle(rigid_body)
+        .insert_bundle(collider)
+        .insert(RigidBodyPositionSync::Discrete)
         .insert(Player);
 }
 
