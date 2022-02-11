@@ -1,9 +1,7 @@
+pub mod camera;
+
 use bevy::prelude::*;
 
-// Components
-fn hello_world() {
-    println!("hello world!");
-}
 
 fn main() {
     App::new()
@@ -29,11 +27,11 @@ struct Player;
 struct Name(String);
 
 // Systems
-fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<ColorMaterial>>) {
+fn spawn_player(mut commands: Commands) {
     commands
         .spawn_bundle(SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::new(10.0, 10.0)),
+                custom_size: Some(Vec2::new(1.0, 1.0)),
                 color: Color::GRAY,
                 ..Default::default()
             },
@@ -44,5 +42,5 @@ fn spawn_player(mut commands: Commands, mut materials: ResMut<Assets<ColorMateri
 
 
 fn setup(mut commands: Commands) {
-    commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+    commands.spawn_bundle(camera::new_camera_2d());
 }
